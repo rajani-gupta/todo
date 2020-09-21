@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./assets/fontawesome-free-5.14.0-web/css/fontawesome.min.css" rel="stylesheet">
+  <link href="./assets/fontawesome-free-5.14.0-web/css/brands.min.css" rel="stylesheet">
+  <link href="./assets/fontawesome-free-5.14.0-web/css/solid.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/bootstrap-4.5.2-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./style.css">
+  <title>To_Do_List</title>
+</head>
+
+<body>
+  <section>
+    <div class="container">
+      <h2 class="py-4" style="text-align: centre; text-transform:uppercase;color:rebeccapurple;">To_Do_List</h2>
+      <input class="mb-5" type="text" id="myInput" placeholder="names..." onkeyup="searchFun()">
+      <div id="mountains"></div>
+      <input type="button" class="button" id="edit_Row" onclick="add_Row()" value="Add Item">
+      <nav class="pagination justify-content-end">
+        <ul class="pagination">
+
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+
+  <script>
+
+    function createDom(type, props, ...children) {
+      let dom = document.createElement(type);
+      for (let attr of Object.keys(props)) {
+        dom.setAttribute(attr, props[attr]);
+      }
+      for (let child of children) {
+        if (typeof child != "string") dom.appendChild(child);
+        else dom.appendChild(document.createTextNode(child));
+      }
+      return dom;
+
+    }
+    function action_Detail(id) {
+      let closeBtn = document.createElement("span");
+      closeBtn.className = "close";
+      closeBtn.style.cursor = "pointer";
+      closeBtn.style.float = "left";
+      closeBtn.innerHTML = "&times;";
+      closeBtn.addEventListener('click', () => {
+        console.log('this is the id::', id)
+        deleteRow(id)
+      })
+      console.log('this is the closebtn', closeBtn)
+      return closeBtn;
+    }
+
+    var person_details = [
+      { id: "1", firstName: "John", lastName: "Doe", Age: "46", Gender: "Male", Action: action_Detail(1) },
+      { id: "2", firstName: "Jojo", lastName: "Man", Age: "29", Gender: "Female", Action: action_Detail(2) },
+      { id: "3", firstName: "res", lastName: "tubh", Age: "35", Gender: "Male", Action: action_Detail(3) },
+      { id: "4", firstName: "banana", lastName: "gupta", Age: "15", Gender: "Male", Action: action_Detail(4) }];
+    let key_frame = Object.keys(person_details[0]);
+
+
+    // header
+    let f1 = (key_frame) => {
+      let array1 = [];
+      for (let data of key_frame) {
+        array1.push(createDom('th', {}, data));
+      }
+      return array1;
+    };
+    let table = createDom("table", { class: "table", id: "myTable" });
+    let table_header = createDom('thead', {}, (createDom('tr', {}, ...f1(key_frame))));
+    document.querySelector("#mountains").appendChild(table).appendChild(table_header);
+    let tbody = createDom('tbody', {});
+    document.querySelector("#mountains").appendChild(table).appendChild(tbody);
+
+
+
+    // table body
+    let f2 = (person_details) => {
+      let f3 = [];
+      let table_body = [];
+      for (let data1 of person_details) {
+        let f3 = (data1) => {
+          let array3 = [];
+          for (let data2 in data1) {
+            array3.push(createDom('td', {}, data1[data2]));
+          }
+          return array3;
+        };
+        let tds = f3(data1);
+        table_body.push(createDom('tr', {}, ...tds));
+      }
+      return table_body;
+    };
+    let actualArray = f2(person_details);
+
+    // search bar
+    const searchFun = () => {
+      let searchText = document.getElementById('myInput').value.toLowerCase();
+      let data = person_details.filter(item => item.firstName.toLowerCase().indexOf(searchText) != -1)
+      actualArray = f2(data);
+      pagination();
+    };
+
+    const add_Row = () => {
+      let new_detail = [];
+      let obj = {};
+      for (let key of key_frame) {
+        let user_detail = [];
+        if (key == "Action" || key == 'id') {
+          user_detail = action_Detail();
+        }
+        else {
+          user_detail = prompt(`Please Enter ${key}`, [key]);
+        }
+        obj[key] = user_detail;
+      };
+      let lastId = person_details[person_details.length - 1].id;
+      obj['id'] = `${Number(lastId) + 1}`;
+      person_details.push(obj)
+      console.log('this is the person_details on add::', person_details)
+      actualArray = f2(person_details);
+      pagination();
+    };
+
+    // delete item
+    function deleteRow(id) {
+      var cnfrmMessage = confirm("Are you sure want to remove data ?");
+      if (cnfrmMessage == true) {
+        person_details = person_details.filter(pd => pd.id != id);
+        actualArray = f2(person_details)
+        pagination();
+      }
+      else {
+        alert("Cancelled..!!");
+      }
+    }
+    // pagination
+
+    let currentPage = 1;
+    let pageSize = 3;
+    let pagination = () => {
+      document.querySelector('ul').innerHTML = "";
+
+      let getNumberOfPages = (actualArray) => {
+
+        let array1 = [];
+
+        for (let i = 1; i <= Math.ceil(actualArray.length / pageSize); i++) {
+          array1.push(i);
+        }
+        return array1;
+      };
+
+
+      let loadList = (currentPage) => {
+        let array2 = [];
+        let startIndex = pageSize * (currentPage - 1);
+        let endIndex = startIndex + pageSize;
+        array2 = actualArray.slice(startIndex, endIndex);
+        contentOfPage(array2);
+
+
+      };
+
+      let contentOfPage = (array2) => {
+        let data = [];
+        document.querySelector("#myTable").getElementsByTagName('tbody')[0].innerHTML = "";
+        for (let data of array2) {
+          document.querySelector("#myTable").getElementsByTagName('tbody')[0].appendChild(data);
+
+        }
+
+
+      }
+
+
+      // let next_btn = function(){
+      //   var link = document.createElement('li');
+      //   link1 = document.createElement('a');
+      //   link1.setAttribute('href', '#');
+      //   link1.innerText = "&#8250;";
+      //   link.appendChild(link1);
+      //   return link;
+      //   }
+
+      for (let content of getNumberOfPages(actualArray)) {
+
+        var link = document.createElement('li');
+        link1 = document.createElement('a');
+        link1.setAttribute('href', '#');
+        link1.innerText = content;
+        link1.addEventListener('click', () => {
+          loadList(content);
+        });
+
+        link.appendChild(link1);
+
+        document.querySelector('ul').appendChild(link);
+        loadList(content);
+      }
+    };
+    pagination();
+
+    let ids = person_details.map(person => {
+      person.id = person.id + 1
+      return person
+    })
+
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+
+.addToDoButton:hover{
+    background-color:rgb(55,0,255);
+    color:white;
+}
+.button {
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.button:hover{
+    color:white;
+    background-color: #4CAF50 ;
+    overflow:hidden;
+    border:solid #4CAF50;
+}
+.mb-5{
+    width:calc(100% - 16px);
+    /* padding:10px 8px; */
+    font-size:1.2rem;                                                                                        
+   
+}
+.pagination li a {
+    color: black;
+   
+    padding: 8px 16px;
+    margin:2px;
+    text-decoration: none;
+   
+}
+/* .pagination  li a.active {
+    background-color: dodgerblue;
+    color: white;
+} */
+.pagination a:hover{
+    /* background-color: #ddd; */
+    color: white;
+    background-color: dodgerblue;
+} 
